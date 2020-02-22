@@ -1,0 +1,39 @@
+ruta: /var/lib/jenkins
+adduser jenkins sudo
+
+wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+Then add the following entry in your /etc/apt/sources.list:
+deb https://pkg.jenkins.io/debian binary/
+sudo apt-get install openjdk-11-jre-headless
+systemctl start jenkins
+
+
+Git
+
+ssh-keygen
+cat /..../.shh/rsa_pub
+go github and add ssh key to repository (private or public)
+paste key
+git clone git@github.com:traxito/jenkinslab.git
+cloned
+
+
+Canviar direcció repositori de git (pasem de https a ssh per accedir)
+nano .git/config
+Remote (origin)= canviar url per la nova amb ssh EX:git@github.com:traxito/jenkinslab.git
+O
+rm -rf carpeta del directori a la nostre màquina. EX: /home/jenkislab
+
+Git commands:
+git status: ens diu quins arxius No estan trackejats al repositori web
+git add Readme.me: afegeix l'arxiu Readme.me per a que comenci a trackejar-lo, pero NO esta al repositori
+git commit -a (tots els arxius) -m (message) "added readme.me": per a trackejar tots els arxius al repositori web, pero encara NO els puja.
+git push -u origin master: puja els arxius al repositori origin (repositori) a l branch master.
+
+Primera conneció Jenkins-GIT
+su jenkins
+cd /tmp
+git clone git@github.com:traxito/jenkinslab.git
+així acceptem la fingerprint de la conexió SSH
+
+Opció per a que cuant detecti un canvi al repository GIT, automáticament Jenkins executi el build: On Build Triggers-> Poll SCM-> Schedule-> H15 * * * * *(every 15 mins)
