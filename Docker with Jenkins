@@ -1,0 +1,59 @@
+#how to setup Jenkins to automate push the image of the container to DockerHub
+
+usermod -a -G docker jenkins (afegim al usuari jenkins en el grup docker)
+amb el usuari jenkins: docker ps (comprovem que funciona)
+comprobem que podem fer login al nostre repositori Docker hub: docker login
+Recordatori Dockerfile: arxiu per a crear imatges de docker amb tot el necessari per a correr l'aplicació
+Creem un Dockerfile al directori del git amb el usuari jenkins amb el següent text:
+
+FROM ubuntu:19.04
+
+RUN apt-get update
+RUN apt-get upgrade -y
+RUN apt-get install python-pip python -y
+#creem un directori on deixar els arxius de la app
+RUN mkdir /opt/app
+#copiem els axius al directori creat
+COPY pruebapython/main.py /opt/app
+#Copiem i executem els requeriments del arxiu requirements
+COPY requirements.txt /opt/app
+RUN pip install -r /opt/app/requirements.txt
+#copiem l'arxiu entrypoint per a que docker executi l'applicació a la carpeta arrel "/"
+COPY docker-entrypoint.sh /
+
+#executem l'arxiu python
+ENTRYPOINT "/docker-entrypoint.sh"
+
+Creem un entrypoint (el que executarà docker cuant inicialitzem el contenidor)
+nano docker-entrypoint.sh
+amb el següent text:
+
+#!/bin/bash
+
+/usr/bin/python /opt/app/main.py
+
+Donem permisos d'execució al entrypoint
+
+chmod +x docker-entrypoint.sh
+
+
+Ara, creem la imatge amb el command: docker build -t testimagejenkins .
+
+Arranquem el contenidor: docker run -p 5000:5000 -it --rm testimagejenkins bash
+
+Ara a Jenkins, a configuració del proyecte, a l'apartat Execute shell:
+
+#!/bin/bash
+echo 'creando entorno virtual'
+virtualenv --python=python3 entornovirtual
+source entornovirtual/bin/activate
+pip install -r requirements.txt
+echo 'instalando requirements'
+python src/main.py &
+echo 'ejecutando aplicación'
+cd src && pytest test_main.py && cd ..
+echo 'creando docker image'
+docker build -t jenkinsdockertest:latest .
+echo 'subiendo imagen docker hub'
+docker tag jenkinsdockertest:latest traxito/jenkinsdockertest:latest
+docker push traxito/jenkinsdockertest:latest
