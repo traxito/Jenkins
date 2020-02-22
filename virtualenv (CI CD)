@@ -1,0 +1,17 @@
+Una vegada hem fet tots els passos de virtualenv i github, en el projecet en el que estem, anem a configuració del projecte a Jenkins i al apartat de Build: execute shell, introduirem un script semblant a aquest:
+
+#!/bin/bash
+echo 'creando entorno virtual'
+virtualenv --python=python3 entornovirtual
+source entornovirtual/bin/activate
+pip install -r requirements.txt
+echo 'instalando requirements'
+python src/main.py &
+echo 'ejecutando aplicación'
+cd src && pytest && cd..
+echo 'desplegando'
+****aquí posaríem algun command per a desplegar la aplicació***
+
+Això que hem fet amb un scrip es pot fer amb els PIPELINES, concretament amb el plugin de pipeline de Jenkins
+
+https://wiki.jenkins.io/download/attachments/74875855/Screen%20Shot%202015-03-24%20at%201.30.52%20PM.png?version=1&modificationDate=1427218270000&api=v2
